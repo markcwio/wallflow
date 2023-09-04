@@ -88,7 +88,7 @@ extern std::map<std::string, std::chrono::high_resolution_clock::time_point> tim
     do {                                                                \
         WF_PREFIX();                                                    \
         timer_times[label] = std::chrono::high_resolution_clock::now(); \
-        std::cout << "[TIMER(" << label << ")] ";                       \
+        std::cout << "[TIMER:" << label << "] ";                        \
         std::cout << "STARTED" << std::endl;                            \
     } while (false)
 
@@ -102,7 +102,7 @@ extern std::map<std::string, std::chrono::high_resolution_clock::time_point> tim
             WF_PREFIX();                                                                                                      \
             auto end_time = std::chrono::high_resolution_clock::now();                                                        \
             auto elapsed_time = std::chrono::duration_cast<std::chrono::microseconds>(end_time - timer_times[label]).count(); \
-            std::cout << "[TIMER(" << label << ")] ";                                                                         \
+            std::cout << "[TIMER:" << label << "] ";                                                                          \
             std::cout << "ENDED(" << std::format("{:.3f}", elapsed_time / 1e3) << "ms)" << std::endl;                         \
         }                                                                                                                     \
     } while (false)

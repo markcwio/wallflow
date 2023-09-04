@@ -7,10 +7,11 @@
 
 void initResources()
 {
-    WF_START_TIMER("initResources");
+    WF_LOG(LogLevel::LINFO, "initialising resources");
+    WF_START_TIMER("initResources()");
     wallflow::CreateAppDataDir();
     wallflow::LoadConfig();
-    WF_END_TIMER("initResources");
+    WF_END_TIMER("initResources()");
 }
 
 int main()

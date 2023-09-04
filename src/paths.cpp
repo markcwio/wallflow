@@ -16,7 +16,7 @@ namespace wallflow {
 void CreateAppDataDir()
 {
     WF_LOG(LogLevel::LINFO, "creating AppData directory");
-    WF_START_TIMER("CreateAppDataDir");
+    WF_START_TIMER("CreateAppDataDir()");
 
     try {
         std::string dir_path = GetAppDataDir();
@@ -25,7 +25,7 @@ void CreateAppDataDir()
             if (!std::filesystem::is_directory(dir_path)) {
                 throw std::runtime_error("expected AppData path to be directory, it is not.");
             }
-            WF_END_TIMER("CreateAppDataDir");
+            WF_END_TIMER("CreateAppDataDir()");
             return;
         }
 
@@ -34,11 +34,11 @@ void CreateAppDataDir()
         }
 
     } catch (const std::exception& ex) {
-        WF_END_TIMER("CreateAppDataDir");
+        WF_END_TIMER("CreateAppDataDir()");
         throw;
     }
 
-    WF_END_TIMER("CreateAppDataDir");
+    WF_END_TIMER("CreateAppDataDir()");
 }
 
 std::string GetAppDataDir()
