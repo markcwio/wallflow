@@ -18,6 +18,8 @@ add_executable(
     icon.rc
 )
 
+message("CMBT:" ${CMAKE_BUILD_TYPE})
+
 if(NOT DEFINED APP_DATA_DIR)
     set(APP_DATA_DIR "WallFlow" CACHE STRING "Directory to use in AppData")
 endif()
@@ -31,9 +33,12 @@ target_compile_definitions(
     STB_IMAGE_IMPLEMENTATION
     STB_IMAGE_WRITE_IMPLEMENTATION
     APP_DATA_DIR="${APP_DATA_DIR}"
-    ENABLE_LOGGING
     PROJECT_ROOT="${PROJECT_SOURCE_DIR}"
 )
+
+if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE ENABLE_LOGGING)
+endif()
 
 target_include_directories(
     ${PROJECT_NAME}
