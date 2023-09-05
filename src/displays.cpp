@@ -35,11 +35,10 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
 
         Display display;
 
-        std::wstring id;
+        std::wstring wid;
         for (int i = 0; i < 32 && monitor_info.szDevice[i] != L'\0'; ++i) {
-            id += monitor_info.szDevice[i];
+            wid += monitor_info.szDevice[i];
         }
-        display.id = WStringToString(id);
 
         RECT rect = monitor_info.rcMonitor;
 
@@ -49,6 +48,7 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
         display.width = rect.right - rect.left;
         display.height = rect.bottom - rect.top;
 
+        display.id = std::format("{}:{}x{}", WStringToString(wid), display.width, display.height);
         display.alias = GetOrCreateAlias(display.id, std::format("{}x{}", display.width, display.height));
 
         tmp_displays.push_back(display);

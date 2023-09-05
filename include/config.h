@@ -15,6 +15,8 @@ struct Config {
 
 extern Config* config;
 
+std::string GetConfigPath();
+std::string GetDisplayAliasPath();
 void LoadConfig();
 bool LoadConfigIfModified();
 void CreateDefaultConfig();

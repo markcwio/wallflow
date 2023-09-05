@@ -28,7 +28,7 @@ std::string Config::ToString()
         jpegQuality);
 }
 
-std::string getConfigPath()
+std::string GetConfigPath()
 {
     return GetAppDataPath("config.json");
 }
@@ -37,7 +37,7 @@ std::time_t getConfigModifiedTime()
 {
     struct stat file_stat;
 
-    if (stat(getConfigPath().c_str(), &file_stat) == 0) {
+    if (stat(GetConfigPath().c_str(), &file_stat) == 0) {
         return file_stat.st_mtime;
     }
 
@@ -53,13 +53,13 @@ void LoadConfig()
     WF_LOG(LogLevel::LINFO, "loading config file");
     WF_START_TIMER("LoadConfig()");
 
-    std::string config_path = getConfigPath();
+    std::string config_path = GetConfigPath();
 
     if (!std::filesystem::exists(config_path)) {
         CreateDefaultConfig();
     }
 
-    std::string in_path = getConfigPath();
+    std::string in_path = GetConfigPath();
     std::ifstream in_file(in_path);
 
     if (!in_file.is_open()) {
@@ -120,7 +120,7 @@ void CreateDefaultConfig()
     config_json["imageFormat"] = "jpg";
     config_json["jpegQuality"] = 95;
 
-    std::string out_path = getConfigPath();
+    std::string out_path = GetConfigPath();
     std::ofstream out_file(out_path);
 
     if (!out_file.is_open()) {
@@ -151,7 +151,7 @@ void SaveConfig()
     config_json["imageFormat"] = config->imageFormat;
     config_json["jpegQuality"] = config->jpegQuality;
 
-    std::string out_path = getConfigPath();
+    std::string out_path = GetConfigPath();
     std::ofstream out_file(out_path);
 
     if (!out_file.is_open()) {
@@ -167,14 +167,14 @@ void SaveConfig()
 
 std::mutex display_alias_mtx;
 
-std::string getDisplayAliasPath()
+std::string GetDisplayAliasPath()
 {
     return GetAppDataPath("display_aliases.json");
 }
 
 void CreateDisplayAliasFileIfNotFound()
 {
-    std::string alias_path = getDisplayAliasPath();
+    std::string alias_path = GetDisplayAliasPath();
 
     if (std::filesystem::exists(alias_path)) {
         return;
@@ -195,7 +195,7 @@ std::string GetDisplayAlias(std::string id)
     std::lock_guard<std::mutex> lock(display_alias_mtx);
     CreateDisplayAliasFileIfNotFound();
 
-    std::string in_path = getDisplayAliasPath();
+    std::string in_path = GetDisplayAliasPath();
     std::ifstream in_file(in_path);
 
     if (!in_file.is_open()) {
@@ -216,7 +216,7 @@ void SaveDisplayAlias(std::string id, std::string alias)
     std::lock_guard<std::mutex> lock(display_alias_mtx);
     CreateDisplayAliasFileIfNotFound();
 
-    std::string alias_path = getDisplayAliasPath();
+    std::string alias_path = GetDisplayAliasPath();
     std::ifstream in_file(alias_path);
 
     if (!in_file.is_open()) {
