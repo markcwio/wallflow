@@ -19,5 +19,9 @@ void LoadConfig();
 bool LoadConfigIfModified();
 void CreateDefaultConfig();
 void SaveConfig();
+void CreateDisplayAliasFileIfNotFound();
+std::string GetDisplayAlias(std::string id);
+void SaveDisplayAlias(std::string id, std::string alias);
+std::string GetOrCreateAlias(std::string id, std::string alias);
 
 }

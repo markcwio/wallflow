@@ -1,4 +1,3 @@
-
 #include "paths.h"
 #include "convert.h"
 #include "log.h"
@@ -8,8 +7,8 @@
 #include <iostream>
 #include <sstream>
 
-#include <Shlobj.h>
-#include <Windows.h>
+#include <shlobj.h>
+#include <windows.h>
 
 namespace wallflow {
 

@@ -164,4 +164,87 @@ void SaveConfig()
 
     WF_END_TIMER("SaveConfig()");
 }
+
+std::mutex display_alias_mtx;
+
+std::string getDisplayAliasPath()
+{
+    return GetAppDataPath("display_aliases.json");
+}
+
+void CreateDisplayAliasFileIfNotFound()
+{
+    std::string alias_path = getDisplayAliasPath();
+
+    if (std::filesystem::exists(alias_path)) {
+        return;
+    }
+
+    std::ofstream out_file(alias_path);
+
+    if (!out_file.is_open()) {
+        throw std::runtime_error("could not open display aliases file to write");
+    }
+
+    nlohmann::json alias_json;
+    out_file << std::setw(4) << alias_json << std::endl;
+}
+
+std::string GetDisplayAlias(std::string id)
+{
+    std::lock_guard<std::mutex> lock(display_alias_mtx);
+    CreateDisplayAliasFileIfNotFound();
+
+    std::string in_path = getDisplayAliasPath();
+    std::ifstream in_file(in_path);
+
+    if (!in_file.is_open()) {
+        throw std::runtime_error("could not open display alias file to read");
+    }
+
+    nlohmann::json alias_json = nlohmann::json::parse(in_file);
+
+    if (alias_json[id].is_string()) {
+        return alias_json[id];
+    }
+
+    return "";
+}
+
+void SaveDisplayAlias(std::string id, std::string alias)
+{
+    std::lock_guard<std::mutex> lock(display_alias_mtx);
+    CreateDisplayAliasFileIfNotFound();
+
+    std::string alias_path = getDisplayAliasPath();
+    std::ifstream in_file(alias_path);
+
+    if (!in_file.is_open()) {
+        throw std::runtime_error("could not open display alias file to read");
+    }
+
+    nlohmann::json alias_json = nlohmann::json::parse(in_file);
+
+    alias_json[id] = alias;
+
+    std::ofstream out_file(alias_path);
+
+    if (!out_file.is_open()) {
+        throw std::runtime_error("could not open display aliases file to write");
+    }
+
+    out_file << std::setw(4) << alias_json << std::endl;
+}
+
+std::string GetOrCreateAlias(std::string id, std::string alias)
+{
+    std::string result = GetDisplayAlias(id);
+    if (result != "") {
+        return result;
+    }
+
+    SaveDisplayAlias(id, alias);
+    return alias;
+}
+
 }
