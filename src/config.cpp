@@ -114,7 +114,15 @@ void CreateDefaultConfig()
 
     nlohmann::json config_json;
 
-    config_json["wallpaperDir"] = GetUserPath("Pictures\\Wallpapers");
+    std::string wallpaper_path = SelectFolderDialog();
+
+    if (wallpaper_path == "") {
+        throw std::runtime_error("wallpaper folder must be selected");
+    }
+
+    WF_LOG(LogLevel::LINFO, std::format("wallpaper path selected({})", wallpaper_path));
+
+    config_json["wallpaperDir"] = wallpaper_path;
     config_json["changeInterval"] = 300;
     config_json["shuffle"] = true;
     config_json["imageFormat"] = "jpg";

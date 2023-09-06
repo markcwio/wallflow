@@ -76,4 +76,44 @@ std::string GetUserPath(std::string path)
     return std::format("{}\\{}", GetUserDir(), path);
 }
 
+std::string SelectFolderDialog()
+{
+    CoInitialize(NULL);
+
+    std::wstring selectedFolderPath;
+
+    IFileDialog* pFileDialog = NULL;
+    HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
+
+    if (SUCCEEDED(hr)) {
+        DWORD dwOptions;
+        pFileDialog->GetOptions(&dwOptions);
+        pFileDialog->SetOptions(dwOptions | FOS_PICKFOLDERS);
+
+        hr = pFileDialog->Show(NULL);
+
+        if (SUCCEEDED(hr)) {
+            IShellItem* pShellItem;
+            hr = pFileDialog->GetResult(&pShellItem);
+
+            if (SUCCEEDED(hr)) {
+                PWSTR folderPath;
+                hr = pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &folderPath);
+
+                if (SUCCEEDED(hr)) {
+                    selectedFolderPath = folderPath;
+                    CoTaskMemFree(folderPath);
+                }
+                pShellItem->Release();
+            }
+        }
+
+        pFileDialog->Release();
+    }
+
+    CoUninitialize();
+
+    return WStringToString(selectedFolderPath);
+}
+
 }

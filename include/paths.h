@@ -13,5 +13,5 @@ std::string GetAppDataDir();
 std::string GetAppDataPath(std::string path);
 std::string GetUserDir();
 std::string GetUserPath(std::string path);
-
+std::string SelectFolderDialog();
 }
