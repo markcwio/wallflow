@@ -65,13 +65,17 @@ void ShowContextMenu(HWND hWnd)
     }
 
     AppendMenu(hMenu, MF_SEPARATOR, 0, NULL);
+
     AppendMenu(hMenu, MF_STRING, TRAY_REFRESH_ALL, L"Refresh All");
+
     AppendMenu(hMenu, MF_SEPARATOR, 0, NULL);
 
     AppendMenu(hMenu, MF_STRING, TRAY_OPEN_CONFIG, L"Open Config");
     AppendMenu(hMenu, MF_STRING, TRAY_OPEN_ALIASES, L"Open Aliases");
+    AppendMenu(hMenu, MF_STRING, TRAY_CHANGE_WALLPAPER_DIR, L"Change Wallpaper Folder");
 
     AppendMenu(hMenu, MF_SEPARATOR, 0, NULL);
+
     AppendMenu(hMenu, MF_STRING, TRAY_EXIT, L"Exit");
 
     // Get the mouse cursor's position
@@ -118,6 +122,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         case TRAY_OPEN_ALIASES:
             WF_LOG(LogLevel::LINFO, "opening display alias file " + GetDisplayAliasPath());
             ShellExecuteA(NULL, "open", GetDisplayAliasPath().c_str(), NULL, NULL, SW_SHOWNORMAL);
+            break;
+
+        case TRAY_CHANGE_WALLPAPER_DIR:
+            WF_LOG(LogLevel::LINFO, "changing wallpaper folder");
+            ChangeWallpaperDir();
             break;
 
         case TRAY_EXIT: // Handle Exit

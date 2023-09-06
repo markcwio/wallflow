@@ -25,5 +25,5 @@ void CreateDisplayAliasFileIfNotFound();
 std::string GetDisplayAlias(std::string id);
 void SaveDisplayAlias(std::string id, std::string alias);
 std::string GetOrCreateAlias(std::string id, std::string alias);
-
+void ChangeWallpaperDir();
 }

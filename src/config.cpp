@@ -120,7 +120,7 @@ void CreateDefaultConfig()
         throw std::runtime_error("wallpaper folder must be selected");
     }
 
-    WF_LOG(LogLevel::LINFO, std::format("wallpaper path selected({})", wallpaper_path));
+    WF_LOG(LogLevel::LINFO, std::format("wallpaper folder selected ({})", wallpaper_path));
 
     config_json["wallpaperDir"] = wallpaper_path;
     config_json["changeInterval"] = 300;
@@ -253,6 +253,21 @@ std::string GetOrCreateAlias(std::string id, std::string alias)
 
     SaveDisplayAlias(id, alias);
     return alias;
+}
+
+void ChangeWallpaperDir()
+{
+    std::string wallpaper_path = SelectFolderDialog();
+
+    if (wallpaper_path == "") {
+        WF_LOG(LogLevel::LINFO, "no wallpaper folder selected");
+        return;
+    }
+
+    config->wallpaperDir = wallpaper_path;
+    SaveConfig();
+
+    WF_LOG(LogLevel::LINFO, std::format("wallpaper folder changed to ({})", config->wallpaperDir));
 }
 
 }

@@ -9,6 +9,7 @@
 #define TRAY_OPEN_CONFIG 2
 #define TRAY_OPEN_ALIASES 3
 #define TRAY_REFRESH_ALL 4
+#define TRAY_CHANGE_WALLPAPER_DIR 5
 #define TRAY_DISPLAY_OFFSET 1000
 
 namespace wallflow {
