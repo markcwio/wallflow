@@ -15,7 +15,7 @@ file(GLOB
 add_executable(
     ${PROJECT_NAME}
     ${SOURCES}
-    icon.rc
+    wallflow.rc
 )
 
 message("CMBT:" ${CMAKE_BUILD_TYPE})
