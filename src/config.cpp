@@ -20,12 +20,10 @@ std::time_t last_modified_at;
 std::string Config::ToString()
 {
     return std::format(
-        "Config(wallpaperDir={},changeInterval={},shuffle={},imageFormat={},jpegQuality={})",
+        "Config(wallpaperDir={},refreshSpeed={},shuffle={})",
         wallpaperDir,
-        changeInterval,
-        shuffle,
-        imageFormat,
-        jpegQuality);
+        refreshSpeed,
+        shuffle);
 }
 
 std::string GetConfigPath()
@@ -72,10 +70,8 @@ void LoadConfig()
         config = new Config;
     }
     config->wallpaperDir = json_config["wallpaperDir"];
-    config->changeInterval = json_config["changeInterval"];
+    config->refreshSpeed = json_config["refreshSpeed"];
     config->shuffle = json_config["shuffle"];
-    config->imageFormat = json_config["imageFormat"];
-    config->jpegQuality = json_config["jpegQuality"];
 
     last_modified_at = getConfigModifiedTime();
 
@@ -123,7 +119,7 @@ void CreateDefaultConfig()
     WF_LOG(LogLevel::LINFO, std::format("wallpaper folder selected ({})", wallpaper_path));
 
     config_json["wallpaperDir"] = wallpaper_path;
-    config_json["changeInterval"] = 300;
+    config_json["refreshSpeed"] = 300;
     config_json["shuffle"] = true;
     config_json["imageFormat"] = "jpg";
     config_json["jpegQuality"] = 95;
@@ -154,10 +150,8 @@ void SaveConfig()
     nlohmann::json config_json;
 
     config_json["wallpaperDir"] = config->wallpaperDir;
-    config_json["changeInterval"] = config->changeInterval;
+    config_json["refreshSpeed"] = config->refreshSpeed;
     config_json["shuffle"] = config->shuffle;
-    config_json["imageFormat"] = config->imageFormat;
-    config_json["jpegQuality"] = config->jpegQuality;
 
     std::string out_path = GetConfigPath();
     std::ofstream out_file(out_path);
@@ -268,6 +262,18 @@ void ChangeWallpaperDir()
     SaveConfig();
 
     WF_LOG(LogLevel::LINFO, std::format("wallpaper folder changed to ({})", config->wallpaperDir));
+}
+
+void ToggleShuffle()
+{
+    config->shuffle = !config->shuffle;
+    SaveConfig();
+}
+
+void SetRefreshSpeed(int value)
+{
+    config->refreshSpeed = value;
+    SaveConfig();
 }
 
 }

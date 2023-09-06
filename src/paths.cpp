@@ -116,4 +116,24 @@ std::string SelectFolderDialog()
     return WStringToString(selectedFolderPath);
 }
 
+std::vector<std::string> GetFilesWithExtensions(const std::string& dir_path, const std::vector<std::string>& extensions)
+{
+    std::vector<std::string> files;
+
+    for (const auto& entry : std::filesystem::directory_iterator(dir_path)) {
+        if (!entry.is_regular_file()) {
+            continue;
+        }
+        std::string file_path = entry.path().string();
+        for (const std::string& ext : extensions) {
+            if (file_path.ends_with("." + ext)) {
+                files.push_back(file_path);
+                break;
+            }
+        }
+    }
+
+    return files;
+}
+
 }

@@ -6,10 +6,8 @@ namespace wallflow {
 
 struct Config {
     std::string wallpaperDir;
-    unsigned int changeInterval;
+    unsigned int refreshSpeed;
     bool shuffle;
-    std::string imageFormat;
-    unsigned int jpegQuality;
     std::string ToString();
 };
 
@@ -26,4 +24,6 @@ std::string GetDisplayAlias(std::string id);
 void SaveDisplayAlias(std::string id, std::string alias);
 std::string GetOrCreateAlias(std::string id, std::string alias);
 void ChangeWallpaperDir();
+void ToggleShuffle();
+void SetRefreshSpeed(int value);
 }

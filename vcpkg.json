@@ -3,6 +3,7 @@
     "name": "wallflow",
     "version": "0.0.1",
     "dependencies": [
-      {"name": "nlohmann-json", "features": []}
+      {"name": "nlohmann-json", "features": []},
+      {"name": "imageinfo", "features": []}
     ]
   }

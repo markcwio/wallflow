@@ -48,8 +48,10 @@ BOOL CALLBACK MonitorEnumProc(HMONITOR hMonitor, HDC hdcMonitor, LPRECT lprcMoni
         display.width = rect.right - rect.left;
         display.height = rect.bottom - rect.top;
 
-        display.id = std::format("{}:{}x{}", WStringToString(wid), display.width, display.height);
-        display.alias = GetOrCreateAlias(display.id, std::format("{}x{}", display.width, display.height));
+        std::string repo_key = std::format("{}x{}", display.width, display.height);
+        display.id = std::format("{}:{}", WStringToString(wid), repo_key);
+        display.repoKey = repo_key;
+        display.alias = GetOrCreateAlias(display.id, repo_key);
 
         tmp_displays.push_back(display);
     }

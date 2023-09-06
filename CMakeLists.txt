@@ -49,4 +49,7 @@ target_include_directories(
 find_package(nlohmann_json CONFIG REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
 
+find_package(imageinfo CONFIG REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE imageinfo::imageinfo)
+
 file(COPY "assets/icon.ico" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}/${CMAKE_BUILD_TYPE}")

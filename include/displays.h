@@ -14,6 +14,7 @@ struct Display {
     int16_t y;
     uint16_t width;
     uint16_t height;
+    std::string repoKey;
     std::string ToString();
 };
 

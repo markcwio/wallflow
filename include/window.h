@@ -5,11 +5,16 @@
 #include <windows.h>
 
 #define WM_TRAY_ICON (WM_USER + 1)
+
 #define TRAY_EXIT 1
 #define TRAY_OPEN_CONFIG 2
 #define TRAY_OPEN_ALIASES 3
 #define TRAY_REFRESH_ALL 4
 #define TRAY_CHANGE_WALLPAPER_DIR 5
+#define TRAY_TOGGLE_SHUFFLE 6
+#define TRAY_SHOW_CHANGE_INTERVAL 7
+#define TRAY_SAVE_CHANGE_INTERVAL 8
+
 #define TRAY_DISPLAY_OFFSET 1000
 
 namespace wallflow {

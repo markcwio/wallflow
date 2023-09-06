@@ -2,6 +2,7 @@
 #include "displays.h"
 #include "log.h"
 #include "paths.h"
+#include "repo.h"
 #include "window.h"
 
 #include <iostream>
@@ -16,6 +17,7 @@ void initResources()
     wallflow::LoadConfig();
     wallflow::LoadDisplays();
     wallflow::InitWindow();
+    wallflow::PopulateAllRepos();
     WF_END_TIMER("initResources()");
 }
 
@@ -24,7 +26,6 @@ int main()
 
     try {
         initResources();
-
         MSG msg;
         while (!wallflow::should_exit && GetMessage(&msg, NULL, 0, 0)) {
             TranslateMessage(&msg);
