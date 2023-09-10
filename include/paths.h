@@ -14,6 +14,6 @@ std::string GetAppDataDir();
 std::string GetAppDataPath(std::string path);
 std::string GetUserDir();
 std::string GetUserPath(std::string path);
-std::string SelectFolderDialog();
+std::string SelectDirectoryDialog();
 std::vector<std::string> GetFilesWithExtensions(const std::string& dir_path, const std::vector<std::string>& extensions);
 }

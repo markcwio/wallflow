@@ -1,9 +1,11 @@
 {
     "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
     "name": "wallflow",
-    "version": "0.0.1",
+    "version": "1.0.0",
     "dependencies": [
-      {"name": "nlohmann-json", "features": []},
-      {"name": "imageinfo", "features": []}
+      {"name": "nlohmann-json"},
+      {"name": "imageinfo"},
+      {"name": "libpng"},
+      {"name": "stb"}
     ]
   }

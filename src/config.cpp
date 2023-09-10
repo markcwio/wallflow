@@ -20,9 +20,9 @@ std::time_t last_modified_at;
 std::string Config::ToString()
 {
     return std::format(
-        "Config(wallpaperDir={},refreshSpeed={},shuffle={})",
+        "Config(wallpaperDir={},cycleSpeed={},shuffle={})",
         wallpaperDir,
-        refreshSpeed,
+        cycleSpeed,
         shuffle);
 }
 
@@ -70,7 +70,7 @@ void LoadConfig()
         config = new Config;
     }
     config->wallpaperDir = json_config["wallpaperDir"];
-    config->refreshSpeed = json_config["refreshSpeed"];
+    config->cycleSpeed = json_config["cycleSpeed"];
     config->shuffle = json_config["shuffle"];
 
     last_modified_at = getConfigModifiedTime();
@@ -110,16 +110,16 @@ void CreateDefaultConfig()
 
     nlohmann::json config_json;
 
-    std::string wallpaper_path = SelectFolderDialog();
+    std::string wallpaper_path = SelectDirectoryDialog();
 
     if (wallpaper_path == "") {
-        throw std::runtime_error("wallpaper folder must be selected");
+        throw std::runtime_error("wallpaper directory must be selected");
     }
 
-    WF_LOG(LogLevel::LINFO, std::format("wallpaper folder selected ({})", wallpaper_path));
+    WF_LOG(LogLevel::LINFO, std::format("wallpaper directory selected ({})", wallpaper_path));
 
     config_json["wallpaperDir"] = wallpaper_path;
-    config_json["refreshSpeed"] = 300;
+    config_json["cycleSpeed"] = 300;
     config_json["shuffle"] = true;
     config_json["imageFormat"] = "jpg";
     config_json["jpegQuality"] = 95;
@@ -150,7 +150,7 @@ void SaveConfig()
     nlohmann::json config_json;
 
     config_json["wallpaperDir"] = config->wallpaperDir;
-    config_json["refreshSpeed"] = config->refreshSpeed;
+    config_json["cycleSpeed"] = config->cycleSpeed;
     config_json["shuffle"] = config->shuffle;
 
     std::string out_path = GetConfigPath();
@@ -171,11 +171,14 @@ std::mutex display_alias_mtx;
 
 std::string GetDisplayAliasPath()
 {
+    WF_LOG(LogLevel::LINFO, "retrieving display alias path");
     return GetAppDataPath("display_aliases.json");
 }
 
 void CreateDisplayAliasFileIfNotFound()
 {
+    WF_LOG(LogLevel::LINFO, "creating display alias file if no file is found");
+
     std::string alias_path = GetDisplayAliasPath();
 
     if (std::filesystem::exists(alias_path)) {
@@ -194,6 +197,8 @@ void CreateDisplayAliasFileIfNotFound()
 
 std::string GetDisplayAlias(std::string id)
 {
+    WF_LOG(LogLevel::LINFO, std::format("retrieving display alias ({})", id));
+
     std::lock_guard<std::mutex> lock(display_alias_mtx);
     CreateDisplayAliasFileIfNotFound();
 
@@ -215,6 +220,8 @@ std::string GetDisplayAlias(std::string id)
 
 void SaveDisplayAlias(std::string id, std::string alias)
 {
+    WF_LOG(LogLevel::LINFO, std::format("saving display alias (id={},alias={})", id, alias));
+
     std::lock_guard<std::mutex> lock(display_alias_mtx);
     CreateDisplayAliasFileIfNotFound();
 
@@ -240,8 +247,11 @@ void SaveDisplayAlias(std::string id, std::string alias)
 
 std::string GetOrCreateAlias(std::string id, std::string alias)
 {
+    WF_LOG(LogLevel::LINFO, std::format("retrieving or creating alias for display (id={},alias={})", id, alias));
+
     std::string result = GetDisplayAlias(id);
     if (result != "") {
+        WF_LOG(LogLevel::LINFO, std::format("could not find alias for ({}) using default ({})", id, alias));
         return result;
     }
 
@@ -251,17 +261,19 @@ std::string GetOrCreateAlias(std::string id, std::string alias)
 
 void ChangeWallpaperDir()
 {
-    std::string wallpaper_path = SelectFolderDialog();
+    WF_LOG(LogLevel::LINFO, "chaning wallpaper directory");
+
+    std::string wallpaper_path = SelectDirectoryDialog();
 
     if (wallpaper_path == "") {
-        WF_LOG(LogLevel::LINFO, "no wallpaper folder selected");
+        WF_LOG(LogLevel::LINFO, "no wallpaper directory selected");
         return;
     }
 
     config->wallpaperDir = wallpaper_path;
     SaveConfig();
 
-    WF_LOG(LogLevel::LINFO, std::format("wallpaper folder changed to ({})", config->wallpaperDir));
+    WF_LOG(LogLevel::LINFO, std::format("wallpaper directory changed to ({})", config->wallpaperDir));
 }
 
 void ToggleShuffle()
@@ -270,9 +282,9 @@ void ToggleShuffle()
     SaveConfig();
 }
 
-void SetRefreshSpeed(int value)
+void SetCycleSpeed(int value)
 {
-    config->refreshSpeed = value;
+    config->cycleSpeed = value;
     SaveConfig();
 }
 

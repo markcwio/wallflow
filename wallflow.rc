@@ -3,8 +3,8 @@
 IDI_ICON1 ICON DISCARDABLE "assets/icon.ico"
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0, 0, 1, 0
- PRODUCTVERSION 0, 0, 1, 0
+ FILEVERSION 1, 0, 0, 0
+ PRODUCTVERSION 1, 0, 0, 0
  FILEFLAGSMASK 0x3fL
  FILEFLAGS 0x0L
  FILEOS 0x40004L
@@ -16,13 +16,13 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "CompanyName", "Mark C Willmoth"
-            VALUE "FileDescription", "WallFlow Application"
-            VALUE "FileVersion", "0.0.1.0"
+            VALUE "FileDescription", "WallFlow"
+            VALUE "FileVersion", "1.0.0.0"
             VALUE "InternalName", "WallFlow"
             VALUE "LegalCopyright", "Copyright (C) Mark C Willmoth"
             VALUE "OriginalFilename", "wallflow.exe"
             VALUE "ProductName", "WallFlow"
-            VALUE "ProductVersion", "0.0.1.0"
+            VALUE "ProductVersion", "1.0.0.0"
         END
     END
 

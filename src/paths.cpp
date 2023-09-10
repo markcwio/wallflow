@@ -76,44 +76,44 @@ std::string GetUserPath(std::string path)
     return std::format("{}\\{}", GetUserDir(), path);
 }
 
-std::string SelectFolderDialog()
+std::string SelectDirectoryDialog()
 {
     CoInitialize(NULL);
 
-    std::wstring selectedFolderPath;
+    std::wstring selected_dir;
 
-    IFileDialog* pFileDialog = NULL;
-    HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pFileDialog));
+    IFileDialog* p_file_dialog = NULL;
+    HRESULT hr = CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&p_file_dialog));
 
     if (SUCCEEDED(hr)) {
         DWORD dwOptions;
-        pFileDialog->GetOptions(&dwOptions);
-        pFileDialog->SetOptions(dwOptions | FOS_PICKFOLDERS);
+        p_file_dialog->GetOptions(&dwOptions);
+        p_file_dialog->SetOptions(dwOptions | FOS_PICKFOLDERS);
 
-        hr = pFileDialog->Show(NULL);
+        hr = p_file_dialog->Show(NULL);
 
         if (SUCCEEDED(hr)) {
-            IShellItem* pShellItem;
-            hr = pFileDialog->GetResult(&pShellItem);
+            IShellItem* p_shell_item;
+            hr = p_file_dialog->GetResult(&p_shell_item);
 
             if (SUCCEEDED(hr)) {
-                PWSTR folderPath;
-                hr = pShellItem->GetDisplayName(SIGDN_FILESYSPATH, &folderPath);
+                PWSTR dir_path;
+                hr = p_shell_item->GetDisplayName(SIGDN_FILESYSPATH, &dir_path);
 
                 if (SUCCEEDED(hr)) {
-                    selectedFolderPath = folderPath;
-                    CoTaskMemFree(folderPath);
+                    selected_dir = dir_path;
+                    CoTaskMemFree(dir_path);
                 }
-                pShellItem->Release();
+                p_shell_item->Release();
             }
         }
 
-        pFileDialog->Release();
+        p_file_dialog->Release();
     }
 
     CoUninitialize();
 
-    return WStringToString(selectedFolderPath);
+    return WStringToString(selected_dir);
 }
 
 std::vector<std::string> GetFilesWithExtensions(const std::string& dir_path, const std::vector<std::string>& extensions)

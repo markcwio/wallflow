@@ -3,7 +3,9 @@
 #include "convert.h"
 #include "displays.h"
 #include "log.h"
+#include "mem.h"
 #include "repo.h"
+#include "wallpapers.h"
 
 #include <format>
 #include <iostream>
@@ -43,17 +45,6 @@ WindowsError GetLastWindowsError()
     return windows_error;
 }
 
-void PrintWindowsError(WindowsError& error)
-{
-    std::string message = error.message;
-
-    std::regex pattern("^[\\s\\n]+|[\\s\\n]+$");
-
-    message = std::regex_replace(message, pattern, "");
-
-    std::cout << std::format("WindowsError(code={}, message={})", error.code, message) << std::endl;
-}
-
 void ShowContextMenu(HWND hWnd)
 {
     HMENU hMenu = CreatePopupMenu();
@@ -61,20 +52,20 @@ void ShowContextMenu(HWND hWnd)
     int display_menu_offset = 1000;
 
     for (size_t i = 0; i < displays.size(); ++i) {
-        std::string label = std::format("Refresh {}", displays[i].alias);
+        std::string label = std::format("Cycle {}", GetDisplayAlias(displays[i].id));
         AppendMenu(hMenu, MF_STRING, display_menu_offset + i, StringToWString(label).c_str());
     }
 
     AppendMenu(hMenu, MF_SEPARATOR, 0, NULL);
 
-    AppendMenu(hMenu, MF_STRING, TRAY_REFRESH_ALL, L"Refresh All");
+    AppendMenu(hMenu, MF_STRING, TRAY_CYCLE_ALL, L"Cycle All");
 
     AppendMenu(hMenu, MF_SEPARATOR, 0, NULL);
 
-    AppendMenu(hMenu, MF_STRING, TRAY_OPEN_CONFIG, L"Open Config");
+    // AppendMenu(hMenu, MF_STRING, TRAY_OPEN_CONFIG, L"Open Config");
     AppendMenu(hMenu, MF_STRING, TRAY_OPEN_ALIASES, L"Open Aliases");
-    AppendMenu(hMenu, MF_STRING, TRAY_CHANGE_WALLPAPER_DIR, L"Change Wallpaper Folder");
-    AppendMenu(hMenu, MF_STRING, TRAY_SHOW_CHANGE_INTERVAL, L"Change Refresh Speed");
+    AppendMenu(hMenu, MF_STRING, TRAY_CHANGE_WALLPAPER_DIR, L"Change Wallpaper Directory");
+    AppendMenu(hMenu, MF_STRING, TRAY_SHOW_CYCLE_INTERVAL, L"Change Cycle Speed");
 
     if (config->shuffle) {
         AppendMenu(hMenu, MF_STRING, TRAY_TOGGLE_SHUFFLE, L"Disable Shuffle");
@@ -105,7 +96,9 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         WF_LOG(LogLevel::LINFO, "display change detected");
         LoadDisplays();
         PopulateAllRepos();
+        CycleAllDisplays();
         break;
+
     case WM_TRAY_ICON:
         switch (lParam) {
         case WM_RBUTTONUP:
@@ -114,10 +107,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         }
 
     case WM_COMMAND:
-        if (LOWORD(wParam) >= TRAY_DISPLAY_OFFSET) {
-            int display_index = LOWORD(wParam) - TRAY_DISPLAY_OFFSET;
-            std::string message = std::format("refreshing display {}", displays[display_index].ToString());
-            WF_LOG(LogLevel::LINFO, message);
+        if (LOWORD(wParam) >= TRAY_CYCLE_DISPLAY_OFFSET) {
+            int display_index = LOWORD(wParam) - TRAY_CYCLE_DISPLAY_OFFSET;
+            WF_LOG(LogLevel::LINFO, std::format("cycling display {}", displays[display_index].ToString()));
+            CycleDisplay(displays[display_index]);
             break;
         }
 
@@ -134,7 +127,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             break;
 
         case TRAY_CHANGE_WALLPAPER_DIR:
-            WF_LOG(LogLevel::LINFO, "changing wallpaper folder");
+            WF_LOG(LogLevel::LINFO, "changing wallpaper directory");
             ChangeWallpaperDir();
             PopulateAllRepos();
             break;
@@ -147,20 +140,22 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         case TRAY_EXIT: // Handle Exit
             Shell_NotifyIcon(NIM_DELETE, &nid);
-            DestroyWindow(hWnd);
-            should_exit = true;
+            PostQuitMessage(0);
+            // DestroyWindow(hWnd);
+            // should_exit = true;
             break;
 
-        case TRAY_REFRESH_ALL:
-            WF_LOG(LogLevel::LINFO, "refreshing all displays");
+        case TRAY_CYCLE_ALL:
+            WF_LOG(LogLevel::LINFO, "cycling all displays");
+            CycleAllDisplays();
             break;
 
-        case TRAY_SHOW_CHANGE_INTERVAL: {
-            WF_LOG(LogLevel::LINFO, "changing refresh speed");
+        case TRAY_SHOW_CYCLE_INTERVAL: {
+            WF_LOG(LogLevel::LINFO, "changing cycle speed");
 
-            std::string value = std::format("{}", config->refreshSpeed);
+            std::string value = std::format("{}", config->cycleSpeed);
             std::wstring wvalue = StringToWString(value);
-            SetWindowText(hWnd, L"Refresh Speed");
+            SetWindowText(hWnd, L"Cycle Speed");
             HWND hEdit = CreateWindowEx(
                 WS_EX_TRANSPARENT,
                 L"EDIT",
@@ -174,14 +169,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                 L"Save",
                 WS_CHILD | WS_VISIBLE | BS_DEFPUSHBUTTON,
                 10, 40, 80, 30, hWnd,
-                (HMENU)TRAY_SAVE_CHANGE_INTERVAL, NULL, NULL);
+                (HMENU)TRAY_SAVE_CYCLE_INTERVAL, NULL, NULL);
 
             ShowWindow(hWnd, SW_SHOW);
             break;
         }
 
-        case TRAY_SAVE_CHANGE_INTERVAL: {
-            WF_LOG(LogLevel::LINFO, "saving refresh speed");
+        case TRAY_SAVE_CYCLE_INTERVAL: {
+            WF_LOG(LogLevel::LINFO, "saving cycle speed");
 
             int textLength = GetWindowTextLengthW(GetDlgItem(hwnd, 0)) + 1;
             wchar_t* buffer = new wchar_t[textLength];
@@ -197,8 +192,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
                     WF_LOG(LogLevel::LWARNING, "invalid integer");
                     break;
                 }
-                if (intValue > 30) {
-                    SetRefreshSpeed(intValue);
+                if (intValue >= 30) {
+                    SetCycleSpeed(intValue);
                     ShowWindow(hWnd, SW_HIDE);
                 }
             } catch (const std::exception& ex) {
